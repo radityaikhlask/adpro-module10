@@ -44,3 +44,18 @@ Anything typed in one client appears in all three, and the server logs every con
 ![Screenshot](./image2c.png)
 
 ![Screenshot](./image2d.png)
+
+## Experiment 2.2: Modifying the WebSocket Port
+
+I changed the WebSocket port from `2000` to `8080`.
+Because a WebSocket connection has two sides, the change had to be made in two files: `src/bin/server.rs` where `TcpListener::bind` defines the address the server listens on, and `src/bin/client.rs` where `ClientBuilder::from_uri` defines which address the client connects to.
+Both sides also use the same `ws://` scheme, which is the WebSocket protocol defined inside the client's URI string — the server doesn't need to declare the protocol explicitly because `ServerBuilder::new().accept(socket)` performs the WebSocket handshake on top of the raw TCP connection.
+After updating both files, the application still runs correctly with all clients connecting on port 8080.
+
+![Screenshot](./image2.2a.png)
+
+![Screenshot](./image2.2b.png)
+
+![Screenshot](./image2.2c.png)
+
+![Screenshot](./image2.2d.png)
