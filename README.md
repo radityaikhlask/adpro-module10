@@ -6,7 +6,7 @@ I implemented the timer example from chapter 2.3 of the Async Book.
 The program spawns one async task that prints "howdy!", awaits a `TimerFuture` for 2 seconds, then prints "done!".
 The executor polls the future, sees it's still pending, and only wakes it up once the timer thread signals completion via the `Waker`.
 
-![Screenshot](./image1a.png)
+![Screenshot](./assets/image1a.png)
 
 ## Experiment 1.2: Understanding How It Works
 
@@ -15,7 +15,7 @@ The "hey hey" line printed before "howdy!", even though `spawn` was called first
 This is because `spawner.spawn()` only queues the future into the task channel — nothing runs until `executor.run()` is called.
 The `println!` outside the async block runs synchronously on the main thread, so it executes immediately, while the spawned task has to wait for the executor to start polling it.
 
-![Screenshot](./image1b.png)
+![Screenshot](./assets/image1b.png)
 
 ## Experiment 1.3: Multiple Spawn and Removing Drop
 
@@ -37,13 +37,13 @@ The server races client input against broadcast messages, while the client races
 To run it, start the server with `cargo run --bin server`, then open three more terminals running `cargo run --bin client` each.
 Anything typed in one client appears in all three, and the server logs every connection and message with the sender's IP and port.
 
-![Screenshot](./image2a.png)
+![Screenshot](./assets/image2a.png)
 
-![Screenshot](./image2b.png)
+![Screenshot](./assets/image2b.png)
 
-![Screenshot](./image2c.png)
+![Screenshot](./assets/image2c.png)
 
-![Screenshot](./image2d.png)
+![Screenshot](./assets/image2d.png)
 
 ## Experiment 2.2: Modifying the WebSocket Port
 
@@ -52,10 +52,25 @@ Because a WebSocket connection has two sides, the change had to be made in two f
 Both sides also use the same `ws://` scheme, which is the WebSocket protocol defined inside the client's URI string — the server doesn't need to declare the protocol explicitly because `ServerBuilder::new().accept(socket)` performs the WebSocket handshake on top of the raw TCP connection.
 After updating both files, the application still runs correctly with all clients connecting on port 8080.
 
-![Screenshot](./image2.2a.png)
+![Screenshot](./assets/image2.2a.png)
 
-![Screenshot](./image2.2b.png)
+![Screenshot](./assets/image2.2b.png)
 
-![Screenshot](./image2.2c.png)
+![Screenshot](./assets/image2.2c.png)
 
-![Screenshot](./image2.2d.png)
+![Screenshot](./assets/image2.2d.png)
+
+## Experiment 2.3: Small Changes — Add IP and Port
+
+I modified the server so that when it broadcasts a message, it prefixes the sender's IP and port to the text.
+The server already receives the client's `SocketAddr` as the `addr` parameter of `handle_connection`, so I changed the broadcast send line from `bcast_tx.send(text.into())?` to `bcast_tx.send(format!("{addr}: {text}"))?`.
+Now every connected client can distinguish who sent each message, because the broadcast payload itself carries the sender's identity.
+This is a stepping stone toward a real chat app where each user would have a username — the IP:port pair acts as a temporary identifier until we add proper login.
+
+![Screenshot](./assets/image2.3a.png)
+
+![Screenshot](./assets/image2.3b.png)
+
+![Screenshot](./assets/image2.3c.png)
+
+![Screenshot](./assets/image2.3d.png)
